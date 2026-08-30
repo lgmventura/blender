@@ -22,6 +22,7 @@ set(INC
   ../../io/wavefront_obj
   # RNA_prototypes.hh
   ${CMAKE_BINARY_DIR}/source/blender/makesrna
+  ${CMAKE_SOURCE_DIR}/extern/midifile/include
 )
 
 set(INC_SYS
@@ -232,6 +233,7 @@ set(SRC
   nodes/node_geo_proximity.cc
   nodes/node_geo_rasterize_points.cc
   nodes/node_geo_raycast.cc
+  nodes/node_geo_read_midi_file.cc
   nodes/node_geo_realize_instances.cc
   nodes/node_geo_remove_attribute.cc
   nodes/node_geo_rename_attribute.cc
@@ -358,6 +360,7 @@ set(LIB
   PRIVATE bf::windowmanager
   PRIVATE bf::dependencies::optional::gmp
   PRIVATE bf::dependencies::optional::bullet
+  PRIVATE extern_midifile
 )
 
 if(WITH_IO_STL)

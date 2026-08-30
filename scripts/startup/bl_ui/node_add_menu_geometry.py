@@ -707,6 +707,15 @@ class NODE_MT_gn_utilities_sound_base(node_add_menu.NodeMenu):
         self.node_operator(layout, "GeometryNodeSampleSoundFrequencies")
 
 
+class NODE_MT_gn_utilities_music_base(node_add_menu.NodeMenu):
+    bl_label = "Music"
+    menu_path = "Utilities/Music"
+
+    def draw(self, context):
+        layout = self.layout
+        self.node_operator(layout, "GeometryNodeReadMidiFile")
+
+
 class NODE_MT_gn_texture_base(node_add_menu.NodeMenu):
     bl_label = "Texture"
 
@@ -740,6 +749,7 @@ class NODE_MT_gn_utilities_base(node_add_menu.NodeMenu):
         self.draw_menu(layout, path="Utilities/Field")
         self.draw_menu(layout, path="Utilities/List")
         self.draw_menu(layout, path="Utilities/Matrix")
+        self.draw_menu(layout, path="Utilities/Music")
         self.draw_menu(layout, path="Utilities/Rotation")
         self.draw_menu(layout, path="Utilities/Sound")
         layout.separator()
@@ -1161,6 +1171,7 @@ add_menus = {
     "NODE_MT_category_utilities_matrix": NODE_MT_gn_utilities_matrix_base,
     "NODE_MT_category_GEO_UTILITIES_DEPRECATED": NODE_MT_gn_utilities_deprecated_base,
     "NODE_MT_category_utilities_sound": NODE_MT_gn_utilities_sound_base,
+    "NODE_MT_category_utilities_music": NODE_MT_gn_utilities_music_base,
     "NODE_MT_geometry_node_add_all": NODE_MT_gn_all_base,
 }
 add_menus = node_add_menu.generate_menus(
@@ -1227,6 +1238,7 @@ swap_menus = {
     "NODE_MT_gn_utilities_list_swap": NODE_MT_gn_utilities_list_base,
     "NODE_MT_gn_utilities_matrix_swap": NODE_MT_gn_utilities_matrix_base,
     "NODE_MT_gn_utilities_sound_swap": NODE_MT_gn_utilities_sound_base,
+    "NODE_MT_gn_utilities_music_swap": NODE_MT_gn_utilities_music_base,
     "NODE_MT_gn_utilities_deprecated_swap": NODE_MT_gn_utilities_deprecated_base,
     "NODE_MT_geometry_node_swap_all": NODE_MT_gn_all_base,
 }
