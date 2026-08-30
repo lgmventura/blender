@@ -233,7 +233,11 @@ set(SRC
   nodes/node_geo_proximity.cc
   nodes/node_geo_rasterize_points.cc
   nodes/node_geo_raycast.cc
-  nodes/node_geo_read_midi_file.cc
+  nodes/node_geo_midi_meta_info.cc
+  nodes/node_geo_midi_note_info.cc
+  nodes/node_geo_midi_filter_channel.cc
+  nodes/node_geo_midi_filter_track.cc
+  nodes/node_geo_midi_read_file.cc
   nodes/node_geo_realize_instances.cc
   nodes/node_geo_remove_attribute.cc
   nodes/node_geo_rename_attribute.cc

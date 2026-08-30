@@ -11121,6 +11121,11 @@ static void rna_def_nodes(BlenderRNA *brna)
   define("GeometryNode", "GeometryNodeMeshToSDFGrid");
   define("GeometryNode", "GeometryNodeMeshToVolume");
   define("GeometryNode", "GeometryNodeMeshUVSphere");
+  define("GeometryNode", "GeometryNodeMidiMetaInfo");
+  define("GeometryNode", "GeometryNodeMidiNoteInfo");
+  define("GeometryNode", "GeometryNodeMidiFilterChannel");
+  define("GeometryNode", "GeometryNodeMidiFilterTrack");
+  define("GeometryNode", "GeometryNodeMidiReadFile");
   define("GeometryNode", "GeometryNodeNURBSOrder");
   define("GeometryNode", "GeometryNodeNURBSWeight");
   define("GeometryNode", "GeometryNodeObjectInfo");
@@ -11135,7 +11140,6 @@ static void rna_def_nodes(BlenderRNA *brna)
   define("GeometryNode", "GeometryNodeProximity");
   define("GeometryNode", "GeometryNodeRasterizePoints", def_geo_rasterize_points);
   define("GeometryNode", "GeometryNodeRaycast");
-  define("GeometryNode", "GeometryNodeReadMidiFile");
   define("GeometryNode", "GeometryNodeRealizeInstances");
   define("GeometryNode", "GeometryNodeRemoveAttribute");
   define("GeometryNode", "GeometryNodeRenameAttribute");

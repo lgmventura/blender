@@ -10,7 +10,7 @@
 #include "MidiFile.h"
 
 
-namespace blender::nodes::node_geo_read_midi_file_cc {
+namespace blender::nodes::node_geo_midi_read_file_cc {
 
 enum class MidiEventType {
   NoteOff = 0,
@@ -163,6 +163,10 @@ static void node_geo_exec(GeoNodeExecParams params) {
         attributes_meta.lookup_or_add_for_write_only_span<float>("ks_key", AttrDomain::Point);
     bke::SpanAttributeWriter<float> ks_mode =
         attributes_meta.lookup_or_add_for_write_only_span<float>("ks_mode", AttrDomain::Point);
+    bke::SpanAttributeWriter<int> channel_attr =
+        attributes_meta.lookup_or_add_for_write_only_span<int>("channel", AttrDomain::Point);
+    bke::SpanAttributeWriter<int> track_attr =
+        attributes_meta.lookup_or_add_for_write_only_span<int>("track", AttrDomain::Point);
     // more...
 
     int idx_meta = 0;
@@ -176,6 +180,8 @@ static void node_geo_exec(GeoNodeExecParams params) {
             time_s_attr.span[idx_meta] = float(ev.seconds);
             time_qn_attr.span[idx_meta] = float(ev.tick) / float(tpq);
             bpm_attr.span[idx_meta] = ev.getTempoBPM();
+            channel_attr.span[idx_meta] = ev.getChannel();
+            track_attr.span[idx_meta] = t;
             idx_meta++;
           }
           else if (ev[1] == 0x58) { // Time signature
@@ -187,6 +193,8 @@ static void node_geo_exec(GeoNodeExecParams params) {
             time_qn_attr.span[idx_meta] = float(ev.tick) / float(tpq);
             ts_numerator.span[idx_meta] = numerator;
             ts_denominator.span[idx_meta] = 1 << denominator_power; // std::pow(2.0f, denominator_power);
+            channel_attr.span[idx_meta] = ev.getChannel();
+            track_attr.span[idx_meta] = t;
             idx_meta++;
           }
           else if (ev[1] == 0x59) { // key signature
@@ -198,6 +206,8 @@ static void node_geo_exec(GeoNodeExecParams params) {
             time_qn_attr.span[idx_meta] = float(ev.tick) / float(tpq);
             ks_key.span[idx_meta] = key;
             ks_mode.span[idx_meta] = mode;
+            channel_attr.span[idx_meta] = ev.getChannel();
+            track_attr.span[idx_meta] = t;
             idx_meta++;
           }
         }
@@ -230,7 +240,7 @@ static void node_geo_exec(GeoNodeExecParams params) {
 
 static void node_register() {
   static bke::bNodeType ntype;
-  bke::node_type_base(ntype, "GeometryNodeReadMidiFile"_ustr, NODE_CLASS_GEOMETRY);
+  bke::node_type_base(ntype, "GeometryNodeMidiReadFile"_ustr, NODE_CLASS_GEOMETRY);
   ntype.ui_name = "Read MIDI File";
   ntype.ui_description = "Extract raw MIDI events as a point cloud";
   ntype.enum_name_legacy = "READ_MIDI_FILE";
