@@ -10,7 +10,7 @@
 #include "RNA_enum_types.hh"
 #include "NOD_rna_define.hh"
 
-namespace blender::nodes::node_geo_midi_note_info_cc {
+namespace blender::nodes::node_geo_midi_time_signature_info_cc {
 
 /* ---------- ENUM FOR TIME UNIT ---------- */
 enum class TimeUnit : int8_t {
@@ -25,28 +25,23 @@ static const EnumPropertyItem time_unit_items[] = {
     };
 
 /* ---------- STORAGE ---------- */
-struct NodeGeometryMidiNoteInfo {
+struct NodeGeometryMidiTimeSignatureInfo {
   uint8_t time_unit;
 };
-NODE_STORAGE_FUNCS(NodeGeometryMidiNoteInfo)
+NODE_STORAGE_FUNCS(NodeGeometryMidiTimeSignatureInfo)
 
 /* ---------- NODE DECLARATION ---------- */
 static void node_declare(NodeDeclarationBuilder &b)
 {
-  b.add_input<decl::Geometry>("Note Events"_ustr)
-  .description("Point cloud from Read MIDI File (Note Events output)");
+  b.add_input<decl::Geometry>("Time Signature Events"_ustr)
+  .description("Point cloud from Read MIDI File (Time Signature Events output)");
 
-  /* Now only one Time and one Duration output, unit controlled by menu. */
   b.add_output<decl::Float>("Time"_ustr)
-      .description("Time of the note (unit controlled by the menu)");
-  b.add_output<decl::Float>("Duration"_ustr)
-      .description("Duration of the note (unit controlled by the menu)");
-  b.add_output<decl::Int>("Pitch"_ustr)
-      .description("MIDI pitch (0-127)");
-  b.add_output<decl::Int>("Velocity"_ustr)
-      .description("MIDI velocity (0-127)");
-  b.add_output<decl::Int>("Channel"_ustr)
-      .description("MIDI channel (0-15)");
+      .description("Time of the time signature event (unit controlled by the menu)");
+  b.add_output<decl::Float>("Numerator"_ustr)
+      .description("Numerator of the time signature (e.g., 4 for 4/4)");
+  b.add_output<decl::Float>("Denominator"_ustr)
+      .description("Denominator of the time signature (e.g., 4 for 4/4)");
   b.add_output<decl::Int>("Track"_ustr)
       .description("Track index");
 }
@@ -60,7 +55,7 @@ static void node_layout(ui::Layout &layout, bContext * /*C*/, PointerRNA *ptr)
 /* ---------- INITIALIZATION ---------- */
 static void node_init(bNodeTree * /*tree*/, bNode *node)
 {
-  NodeGeometryMidiNoteInfo *data = MEM_new<NodeGeometryMidiNoteInfo>(__func__);
+  NodeGeometryMidiTimeSignatureInfo *data = MEM_new<NodeGeometryMidiTimeSignatureInfo>(__func__);
   data->time_unit = uint8_t(TimeUnit::Seconds); /* default */
   node->storage = data;
 }
@@ -68,7 +63,7 @@ static void node_init(bNodeTree * /*tree*/, bNode *node)
 /* ---------- EXECUTION ---------- */
 static void node_geo_exec(GeoNodeExecParams params)
 {
-  GeometrySet geometry_set = params.extract_input<GeometrySet>("Note Events"_ustr);
+  GeometrySet geometry_set = params.extract_input<GeometrySet>("Time Signature Events"_ustr);
   if (!geometry_set.has_pointcloud()) {
     params.set_default_remaining_outputs();
     return;
@@ -81,24 +76,19 @@ static void node_geo_exec(GeoNodeExecParams params)
   }
 
   /* Read storage to get the selected time unit. */
-  const NodeGeometryMidiNoteInfo &storage = node_storage(params.node());
+  const NodeGeometryMidiTimeSignatureInfo &storage = node_storage(params.node());
   const TimeUnit time_unit = TimeUnit(storage.time_unit);
 
-  /* Choose attribute names based on the selected time unit. */
-  const char *time_attr_name = (time_unit == TimeUnit::Seconds) ? "time_on_s" : "time_on_qn";
-  const char *duration_attr_name = (time_unit == TimeUnit::Seconds) ? "duration_s" : "duration_qn";
+  /* Choose attribute name based on the selected time unit. */
+  const char *time_attr_name = (time_unit == TimeUnit::Seconds) ? "time_s" : "time_qn";
 
   /* Set outputs. */
   params.set_output("Time"_ustr,
                     AttributeFieldInput::from(time_attr_name, CPPType::get<float>()));
-  params.set_output("Duration"_ustr,
-                    AttributeFieldInput::from(duration_attr_name, CPPType::get<float>()));
-  params.set_output("Pitch"_ustr,
-                    AttributeFieldInput::from("pitch", CPPType::get<int>()));
-  params.set_output("Velocity"_ustr,
-                    AttributeFieldInput::from("velocity", CPPType::get<int>()));
-  params.set_output("Channel"_ustr,
-                    AttributeFieldInput::from("channel", CPPType::get<int>()));
+  params.set_output("Numerator"_ustr,
+                    AttributeFieldInput::from("ts_numerator", CPPType::get<float>()));
+  params.set_output("Denominator"_ustr,
+                    AttributeFieldInput::from("ts_denominator", CPPType::get<float>()));
   params.set_output("Track"_ustr,
                     AttributeFieldInput::from("track", CPPType::get<int>()));
 }
@@ -109,7 +99,7 @@ static void node_rna(StructRNA *srna)
   RNA_def_node_enum(srna,
                     "time_unit",
                     "Time Unit",
-                    "Unit for time and duration outputs",
+                    "Unit for time output",
                     time_unit_items,
                     NOD_storage_enum_accessors(time_unit),
                     int(TimeUnit::Seconds));
@@ -119,17 +109,17 @@ static void node_rna(StructRNA *srna)
 static void node_register()
 {
   static bke::bNodeType ntype;
-  bke::node_type_base(ntype, "GeometryNodeMidiNoteInfo"_ustr, NODE_CLASS_GEOMETRY);
-  ntype.ui_name = "MIDI Note Info";
-  ntype.ui_description = "Extract MIDI note attributes as fields";
-  ntype.enum_name_legacy = "MIDI_NOTE_INFO";
+  bke::node_type_base(ntype, "GeometryNodeMidiTimeSignatureInfo"_ustr, NODE_CLASS_GEOMETRY);
+  ntype.ui_name = "MIDI Time Signature Info";
+  ntype.ui_description = "Extract MIDI time signature events as fields";
+  ntype.enum_name_legacy = "MIDI_TIME_SIGNATURE_INFO";
   ntype.nclass = NODE_CLASS_GEOMETRY;
   ntype.declare = node_declare;
   ntype.geometry_node_execute = node_geo_exec;
   ntype.draw_buttons = node_layout;
   ntype.initfunc = node_init;
   bke::node_type_storage(ntype,
-                         "NodeGeometryMidiNoteInfo",
+                         "NodeGeometryMidiTimeSignatureInfo",
                          node_free_standard_storage,
                          node_copy_standard_storage);
   bke::node_register_type(ntype);
@@ -138,4 +128,4 @@ static void node_register()
 }
 NOD_REGISTER_NODE(node_register)
 
-}  // namespace blender::nodes::node_geo_midi_note_info_cc
+}  // namespace blender::nodes::node_geo_midi_time_signature_info_cc

@@ -717,7 +717,9 @@ class NODE_MT_gn_utilities_midi_base(node_add_menu.NodeMenu):
         self.node_operator(layout, "GeometryNodeMidiFilterChannel")
         self.node_operator(layout, "GeometryNodeMidiFilterTrack")
         self.node_operator(layout, "GeometryNodeMidiNoteInfo")
-        self.node_operator(layout, "GeometryNodeMidiMetaInfo")
+        self.node_operator(layout, "GeometryNodeMidiTempoInfo")
+        self.node_operator(layout, "GeometryNodeMidiTimeSignatureInfo")
+        self.node_operator(layout, "GeometryNodeMidiKeySignatureInfo")
 
 
 class NODE_MT_gn_texture_base(node_add_menu.NodeMenu):
