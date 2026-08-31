@@ -11121,11 +11121,14 @@ static void rna_def_nodes(BlenderRNA *brna)
   define("GeometryNode", "GeometryNodeMeshToSDFGrid");
   define("GeometryNode", "GeometryNodeMeshToVolume");
   define("GeometryNode", "GeometryNodeMeshUVSphere");
+  define("GeometryNode", "GeometryNodeMidiKeySignatureAt");
   define("GeometryNode", "GeometryNodeMidiKeySignatureInfo");
   define("GeometryNode", "GeometryNodeMidiNoteInfo");
   define("GeometryNode", "GeometryNodeMidiFilterChannel");
   define("GeometryNode", "GeometryNodeMidiFilterTrack");
+  define("GeometryNode", "GeometryNodeMidiTempoAt");
   define("GeometryNode", "GeometryNodeMidiTempoInfo");
+  define("GeometryNode", "GeometryNodeMidiTimeSignatureAt");
   define("GeometryNode", "GeometryNodeMidiTimeSignatureInfo");
   define("GeometryNode", "GeometryNodeMidiReadFile");
   define("GeometryNode", "GeometryNodeNURBSOrder");

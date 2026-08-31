@@ -235,9 +235,12 @@ set(SRC
   nodes/node_geo_raycast.cc
   nodes/node_geo_midi_filter_channel.cc
   nodes/node_geo_midi_filter_track.cc
+  nodes/node_geo_midi_key_signature_at.cc
   nodes/node_geo_midi_key_signature_info.cc
   nodes/node_geo_midi_note_info.cc
+  nodes/node_geo_midi_tempo_at.cc
   nodes/node_geo_midi_tempo_info.cc
+  nodes/node_geo_midi_time_signature_at.cc
   nodes/node_geo_midi_time_signature_info.cc
   nodes/node_geo_midi_read_file.cc
   nodes/node_geo_realize_instances.cc
