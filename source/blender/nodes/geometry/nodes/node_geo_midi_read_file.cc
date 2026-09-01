@@ -54,8 +54,14 @@ static void node_geo_exec(GeoNodeExecParams params)
     return;
   }
 
-  midifile.doTimeAnalysis();
-  midifile.linkNotePairs();
+  try {
+    midifile.doTimeAnalysis();
+    midifile.linkNotePairs();
+  } catch (...) {
+    params.error_message_add(NodeWarningType::Error, "MIDI analysis failed");
+    params.set_default_remaining_outputs();
+    return;
+  }
 
   const int tpq = midifile.getTicksPerQuarterNote();
 
@@ -122,6 +128,16 @@ static void node_geo_exec(GeoNodeExecParams params)
     bke::SpanAttributeWriter<int> track_attr =
         attributes.lookup_or_add_for_write_only_span<int>("track", AttrDomain::Point);
 
+    // initialize them all with 0 to prevent garbage
+    pitch_attr.span.fill(0.0f);
+    velocity_attr.span.fill(0.0f);
+    time_on_s_attr.span.fill(0.0f);
+    time_on_qn_attr.span.fill(0.0f);
+    duration_s_attr.span.fill(0.0f);
+    duration_qn_attr.span.fill(0.0f);
+    channel_attr.span.fill(0.0f);
+    track_attr.span.fill(0.0f);
+
     int idx = 0;
     for (int t = 0; t < midifile.getTrackCount(); t++) {
       for (int e = 0; e < midifile[t].size(); e++) {
@@ -169,6 +185,12 @@ static void node_geo_exec(GeoNodeExecParams params)
     bke::SpanAttributeWriter<int> channel_attr =
         attributes.lookup_or_add_for_write_only_span<int>("channel", AttrDomain::Point);
 
+    time_s_attr.span.fill(0.0f);
+    time_qn_attr.span.fill(0.0f);
+    bpm_attr.span.fill(0.0f);
+    track_attr.span.fill(0.0f);
+    channel_attr.span.fill(0.0f);
+
     int idx = 0;
     for (int t = 0; t < midifile.getTrackCount(); t++) {
       for (int e = 0; e < midifile[t].size(); e++) {
@@ -211,6 +233,14 @@ static void node_geo_exec(GeoNodeExecParams params)
         attributes.lookup_or_add_for_write_only_span<int>("track", AttrDomain::Point);
     bke::SpanAttributeWriter<int> channel_attr =
         attributes.lookup_or_add_for_write_only_span<int>("channel", AttrDomain::Point);
+
+
+    time_s_attr.span.fill(0.0f);
+    time_qn_attr.span.fill(0.0f);
+    ts_numerator_attr.span.fill(0.0f);
+    ts_denominator_attr.span.fill(0.0f);
+    track_attr.span.fill(0.0f);
+    channel_attr.span.fill(0.0f);
 
     int idx = 0;
     for (int t = 0; t < midifile.getTrackCount(); t++) {
@@ -258,6 +288,14 @@ static void node_geo_exec(GeoNodeExecParams params)
         attributes.lookup_or_add_for_write_only_span<int>("track", AttrDomain::Point);
     bke::SpanAttributeWriter<int> channel_attr =
         attributes.lookup_or_add_for_write_only_span<int>("channel", AttrDomain::Point);
+
+
+    time_s_attr.span.fill(0.0f);
+    time_qn_attr.span.fill(0.0f);
+    ks_key_attr.span.fill(0.0f);
+    ks_mode_attr.span.fill(0.0f);
+    track_attr.span.fill(0.0f);
+    channel_attr.span.fill(0.0f);
 
     int idx = 0;
     for (int t = 0; t < midifile.getTrackCount(); t++) {
@@ -307,6 +345,15 @@ static void node_geo_exec(GeoNodeExecParams params)
         attributes.lookup_or_add_for_write_only_span<int>("track", AttrDomain::Point);
     bke::SpanAttributeWriter<int> channel_attr =
         attributes.lookup_or_add_for_write_only_span<int>("channel", AttrDomain::Point);
+
+
+    meta_type_attr.span.fill(-1.0f);
+    time_s_attr.span.fill(0.0f);
+    time_qn_attr.span.fill(0.0f);
+    data1_attr.span.fill(0.0f);
+    data2_attr.span.fill(0.0f);
+    track_attr.span.fill(0.0f);
+    channel_attr.span.fill(0.0f);
 
     int idx = 0;
     for (int t = 0; t < midifile.getTrackCount(); t++) {

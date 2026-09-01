@@ -12,7 +12,6 @@
 
 namespace blender::nodes::node_geo_midi_key_signature_info_cc {
 
-/* ---------- ENUM FOR TIME UNIT ---------- */
 enum class TimeUnit : int8_t {
   Seconds = 0,
   QuarterNotes = 1,
@@ -56,7 +55,7 @@ static void node_layout(ui::Layout &layout, bContext * /*C*/, PointerRNA *ptr)
 static void node_init(bNodeTree * /*tree*/, bNode *node)
 {
   NodeGeometryMidiKeySignatureInfo *data = MEM_new<NodeGeometryMidiKeySignatureInfo>(__func__);
-  data->time_unit = uint8_t(TimeUnit::Seconds); /* default */
+  data->time_unit = uint8_t(TimeUnit::Seconds);
   node->storage = data;
 }
 
@@ -75,14 +74,10 @@ static void node_geo_exec(GeoNodeExecParams params)
     return;
   }
 
-  /* Read storage to get the selected time unit. */
   const NodeGeometryMidiKeySignatureInfo &storage = node_storage(params.node());
   const TimeUnit time_unit = TimeUnit(storage.time_unit);
-
-  /* Choose attribute name based on the selected time unit. */
   const char *time_attr_name = (time_unit == TimeUnit::Seconds) ? "time_s" : "time_qn";
 
-  /* Set outputs. */
   params.set_output("Time"_ustr,
                     AttributeFieldInput::from(time_attr_name, CPPType::get<float>()));
   params.set_output("Key"_ustr,
@@ -123,7 +118,6 @@ static void node_register()
                          node_free_standard_storage,
                          node_copy_standard_storage);
   bke::node_register_type(ntype);
-
   node_rna(ntype.rna_ext.srna);
 }
 NOD_REGISTER_NODE(node_register)

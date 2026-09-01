@@ -8,6 +8,7 @@
 #include "UI_resources.hh"
 #include "RNA_enum_types.hh"
 #include "NOD_rna_define.hh"
+#include "DNA_node_types.h"
 
 namespace blender::nodes::node_geo_midi_tempo_at_cc {
 
@@ -24,9 +25,6 @@ static const EnumPropertyItem time_unit_items[] = {
     };
 
 /* ---------- STORAGE ---------- */
-struct NodeGeometryMidiTempoAt {
-  uint8_t time_unit;
-};
 NODE_STORAGE_FUNCS(NodeGeometryMidiTempoAt)
 
 /* ---------- NODE DECLARATION ---------- */

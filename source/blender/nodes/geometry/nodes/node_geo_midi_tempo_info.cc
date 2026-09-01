@@ -9,10 +9,10 @@
 #include "UI_resources.hh"
 #include "RNA_enum_types.hh"
 #include "NOD_rna_define.hh"
+#include "DNA_node_types.h"
 
 namespace blender::nodes::node_geo_midi_tempo_info_cc {
 
-/* ---------- ENUM FOR TIME UNIT ---------- */
 enum class TimeUnit : int8_t {
   Seconds = 0,
   QuarterNotes = 1,
@@ -25,9 +25,6 @@ static const EnumPropertyItem time_unit_items[] = {
     };
 
 /* ---------- STORAGE ---------- */
-struct NodeGeometryMidiTempoInfo {
-  uint8_t time_unit;
-};
 NODE_STORAGE_FUNCS(NodeGeometryMidiTempoInfo)
 
 /* ---------- NODE DECLARATION ---------- */
@@ -54,7 +51,7 @@ static void node_layout(ui::Layout &layout, bContext * /*C*/, PointerRNA *ptr)
 static void node_init(bNodeTree * /*tree*/, bNode *node)
 {
   NodeGeometryMidiTempoInfo *data = MEM_new<NodeGeometryMidiTempoInfo>(__func__);
-  data->time_unit = uint8_t(TimeUnit::Seconds); /* default */
+  data->time_unit = uint8_t(TimeUnit::Seconds);
   node->storage = data;
 }
 
@@ -73,20 +70,13 @@ static void node_geo_exec(GeoNodeExecParams params)
     return;
   }
 
-  /* Read storage to get the selected time unit. */
   const NodeGeometryMidiTempoInfo &storage = node_storage(params.node());
   const TimeUnit time_unit = TimeUnit(storage.time_unit);
-
-  /* Choose attribute name based on the selected time unit. */
   const char *time_attr_name = (time_unit == TimeUnit::Seconds) ? "time_s" : "time_qn";
 
-  /* Set outputs. */
-  params.set_output("Time"_ustr,
-                    AttributeFieldInput::from(time_attr_name, CPPType::get<float>()));
-  params.set_output("BPM"_ustr,
-                    AttributeFieldInput::from("bpm", CPPType::get<float>()));
-  params.set_output("Track"_ustr,
-                    AttributeFieldInput::from("track", CPPType::get<int>()));
+  params.set_output("Time"_ustr, AttributeFieldInput::from(time_attr_name, CPPType::get<float>()));
+  params.set_output("BPM"_ustr, AttributeFieldInput::from("bpm", CPPType::get<float>()));
+  params.set_output("Track"_ustr, AttributeFieldInput::from("track", CPPType::get<int>()));
 }
 
 /* ---------- RNA ---------- */
@@ -119,7 +109,6 @@ static void node_register()
                          node_free_standard_storage,
                          node_copy_standard_storage);
   bke::node_register_type(ntype);
-
   node_rna(ntype.rna_ext.srna);
 }
 NOD_REGISTER_NODE(node_register)

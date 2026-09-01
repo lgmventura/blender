@@ -9,10 +9,10 @@
 #include "UI_resources.hh"
 #include "RNA_enum_types.hh"
 #include "NOD_rna_define.hh"
+#include "DNA_node_types.h"
 
 namespace blender::nodes::node_geo_midi_note_info_cc {
 
-/* ---------- ENUM FOR TIME UNIT ---------- */
 enum class TimeUnit : int8_t {
   Seconds = 0,
   QuarterNotes = 1,
@@ -25,9 +25,6 @@ static const EnumPropertyItem time_unit_items[] = {
     };
 
 /* ---------- STORAGE ---------- */
-struct NodeGeometryMidiNoteInfo {
-  uint8_t time_unit;
-};
 NODE_STORAGE_FUNCS(NodeGeometryMidiNoteInfo)
 
 /* ---------- NODE DECLARATION ---------- */
@@ -36,7 +33,6 @@ static void node_declare(NodeDeclarationBuilder &b)
   b.add_input<decl::Geometry>("Note Events"_ustr)
   .description("Point cloud from Read MIDI File (Note Events output)");
 
-  /* Now only one Time and one Duration output, unit controlled by menu. */
   b.add_output<decl::Float>("Time"_ustr)
       .description("Time of the note (unit controlled by the menu)");
   b.add_output<decl::Float>("Duration"_ustr)
@@ -61,7 +57,7 @@ static void node_layout(ui::Layout &layout, bContext * /*C*/, PointerRNA *ptr)
 static void node_init(bNodeTree * /*tree*/, bNode *node)
 {
   NodeGeometryMidiNoteInfo *data = MEM_new<NodeGeometryMidiNoteInfo>(__func__);
-  data->time_unit = uint8_t(TimeUnit::Seconds); /* default */
+  data->time_unit = uint8_t(TimeUnit::Seconds);
   node->storage = data;
 }
 
@@ -80,15 +76,11 @@ static void node_geo_exec(GeoNodeExecParams params)
     return;
   }
 
-  /* Read storage to get the selected time unit. */
   const NodeGeometryMidiNoteInfo &storage = node_storage(params.node());
   const TimeUnit time_unit = TimeUnit(storage.time_unit);
-
-  /* Choose attribute names based on the selected time unit. */
   const char *time_attr_name = (time_unit == TimeUnit::Seconds) ? "time_on_s" : "time_on_qn";
   const char *duration_attr_name = (time_unit == TimeUnit::Seconds) ? "duration_s" : "duration_qn";
 
-  /* Set outputs. */
   params.set_output("Time"_ustr,
                     AttributeFieldInput::from(time_attr_name, CPPType::get<float>()));
   params.set_output("Duration"_ustr,
@@ -133,7 +125,6 @@ static void node_register()
                          node_free_standard_storage,
                          node_copy_standard_storage);
   bke::node_register_type(ntype);
-
   node_rna(ntype.rna_ext.srna);
 }
 NOD_REGISTER_NODE(node_register)

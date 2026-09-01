@@ -4012,4 +4012,42 @@ struct NodeStoreBundleItem {
   char _pad = {};
 };
 
+
+/* MIDI nodes storage */
+typedef struct NodeGeometryMidiNoteInfo {
+  uint8_t time_unit; /* TimeUnit enum: 0=Seconds, 1=QuarterNotes */
+  char _pad[7];
+} NodeGeometryMidiNoteInfo;
+
+typedef struct NodeGeometryMidiTempoInfo {
+  uint8_t time_unit; /* TimeUnit enum */
+  char _pad[7];
+} NodeGeometryMidiTempoInfo;
+
+typedef struct NodeGeometryMidiTimeSignatureInfo {
+  uint8_t time_unit; /* TimeUnit enum */
+  char _pad[7];
+} NodeGeometryMidiTimeSignatureInfo;
+
+typedef struct NodeGeometryMidiKeySignatureInfo {
+  uint8_t time_unit; /* TimeUnit enum */
+  char _pad[7];
+} NodeGeometryMidiKeySignatureInfo;
+
+/* Para os nós "At" (Tempo At, Time Signature At, Key Signature At) */
+typedef struct NodeGeometryMidiTempoAt {
+  uint8_t time_unit; /* TimeUnit enum */
+  char _pad[7];
+} NodeGeometryMidiTempoAt;
+
+typedef struct NodeGeometryMidiTimeSignatureAt {
+  uint8_t time_unit; /* TimeUnit enum */
+  char _pad[7];
+} NodeGeometryMidiTimeSignatureAt;
+
+typedef struct NodeGeometryMidiKeySignatureAt {
+  uint8_t time_unit; /* TimeUnit enum */
+  char _pad[7];
+} NodeGeometryMidiKeySignatureAt;
+
 }  // namespace blender
