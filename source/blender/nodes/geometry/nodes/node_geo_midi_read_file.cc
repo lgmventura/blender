@@ -9,6 +9,9 @@
 
 #include "MidiFile.h"
 
+#include <iostream>
+#include <fstream>
+
 namespace blender::nodes::node_geo_midi_read_file_cc {
 
 static void node_declare(NodeDeclarationBuilder &b)
@@ -33,37 +36,69 @@ static void node_declare(NodeDeclarationBuilder &b)
 static void node_geo_exec(GeoNodeExecParams params)
 {
   const std::string file_path = params.extract_input<std::string>("File Path"_ustr);
+
+  /* LOG: imprime o caminho completo */
+  std::cerr << "[Read MIDI] file_path = '" << file_path << "'" << std::endl;
+
   if (file_path.empty()) {
+    std::cerr << "[Read MIDI] ERROR: path is empty" << std::endl;
+    params.error_message_add(NodeWarningType::Error, "File path is empty");
     params.set_default_remaining_outputs();
     return;
   }
 
+  /* Verifica se o arquivo existe e é legível (antes de chamar a biblioteca) */
+  std::ifstream test_file(file_path, std::ios::binary);
+  if (!test_file.good()) {
+    std::cerr << "[Read MIDI] ERROR: file does not exist or cannot be opened: " << file_path << std::endl;
+    params.error_message_add(NodeWarningType::Error, "File not found: " + file_path);
+    params.set_default_remaining_outputs();
+    return;
+  }
+  test_file.close();
+  std::cerr << "[Read MIDI] File exists and is readable." << std::endl;
+
   smf::MidiFile midifile;
   try {
+    std::cerr << "[Read MIDI] Calling midifile.read()..." << std::endl;
     if (!midifile.read(file_path)) {
+      std::cerr << "[Read MIDI] ERROR: midifile.read() returned false" << std::endl;
       params.error_message_add(NodeWarningType::Error,
                                "Failed to read MIDI file (invalid format): " + file_path);
       params.set_default_remaining_outputs();
       return;
     }
+    std::cerr << "[Read MIDI] midifile.read() succeeded." << std::endl;
   }
   catch (const std::exception &e) {
+    std::cerr << "[Read MIDI] EXCEPTION: " << e.what() << std::endl;
     params.error_message_add(NodeWarningType::Error,
                              "MIDI read exception: " + std::string(e.what()));
     params.set_default_remaining_outputs();
     return;
   }
+  catch (...) {
+    std::cerr << "[Read MIDI] UNKNOWN EXCEPTION" << std::endl;
+    params.error_message_add(NodeWarningType::Error, "MIDI read unknown exception");
+    params.set_default_remaining_outputs();
+    return;
+  }
 
+  std::cerr << "[Read MIDI] Starting analysis..." << std::endl;
   try {
     midifile.doTimeAnalysis();
     midifile.linkNotePairs();
-  } catch (...) {
+    std::cerr << "[Read MIDI] Analysis completed." << std::endl;
+  }
+  catch (...) {
+    std::cerr << "[Read MIDI] EXCEPTION in analysis" << std::endl;
     params.error_message_add(NodeWarningType::Error, "MIDI analysis failed");
     params.set_default_remaining_outputs();
     return;
   }
 
   const int tpq = midifile.getTicksPerQuarterNote();
+  std::cerr << "[Read MIDI] Ticks per quarter = " << tpq << std::endl;
 
   /* Count events by type. */
   int note_count = 0;
@@ -247,8 +282,8 @@ static void node_geo_exec(GeoNodeExecParams params)
       for (int e = 0; e < midifile[t].size(); e++) {
         smf::MidiEvent &ev = midifile[t][e];
         if (ev.isMeta() && ev[1] == 0x58) {
-          int numerator = ev[2];
-          int denominator_power = ev[3];
+          int numerator = ev[3];
+          int denominator_power = ev[4];
           positions[idx] = float3(float(ev.seconds), 1.0f, 0.0f);
           time_s_attr.span[idx] = float(ev.seconds);
           time_qn_attr.span[idx] = float(ev.tick) / float(tpq);
@@ -302,8 +337,9 @@ static void node_geo_exec(GeoNodeExecParams params)
       for (int e = 0; e < midifile[t].size(); e++) {
         smf::MidiEvent &ev = midifile[t][e];
         if (ev.isMeta() && ev[1] == 0x59) {
-          int key = ev[2];
-          int mode = ev[3];
+          int8_t key_signed = static_cast<int8_t>(ev[3]);
+          int key = int(key_signed); // -7 to +7
+          int mode = ev[4]; // 0 = major, 1 = minor
           positions[idx] = float3(float(ev.seconds), 2.0f, 0.0f);
           time_s_attr.span[idx] = float(ev.seconds);
           time_qn_attr.span[idx] = float(ev.tick) / float(tpq);

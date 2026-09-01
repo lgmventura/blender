@@ -4034,7 +4034,7 @@ typedef struct NodeGeometryMidiKeySignatureInfo {
   char _pad[7];
 } NodeGeometryMidiKeySignatureInfo;
 
-/* Para os nós "At" (Tempo At, Time Signature At, Key Signature At) */
+// "_at" nodes
 typedef struct NodeGeometryMidiTempoAt {
   uint8_t time_unit; /* TimeUnit enum */
   char _pad[7];
