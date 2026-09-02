@@ -111,6 +111,15 @@ static void node_geo_exec(GeoNodeExecParams params)
   params.set_output("Events"_ustr, std::move(result));
 }
 
+// if ones drags the Note Events output from Read MIDI file and drops in
+// a blank area from Geometry Nodes, a dialogue appears to search for the
+// next node. This register is needed so this node is found there.
+static void node_gather_link_search_ops(GatherLinkSearchOpParams &params)
+{
+  const NodeDeclaration &declaration = *params.node_type().static_declaration;
+  search_link_ops_for_declarations(params, declaration.inputs);
+}
+
 static void node_register()
 {
   static bke::bNodeType ntype;
@@ -121,6 +130,7 @@ static void node_register()
   ntype.nclass = NODE_CLASS_GEOMETRY;
   ntype.declare = node_declare;
   ntype.geometry_node_execute = node_geo_exec;
+  ntype.gather_link_search_ops = node_gather_link_search_ops;
   bke::node_register_type(ntype);
 }
 NOD_REGISTER_NODE(node_register)

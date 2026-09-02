@@ -104,11 +104,26 @@ static void node_geo_exec(GeoNodeExecParams params)
   copy_float_attribute("duration_s");
   copy_float_attribute("duration_qn");
 
-  /* If you have meta attributes like bpm, ts_numerator, etc., copy them similarly. */
+  copy_float_attribute("bpm");
+  copy_float_attribute("ts_numerator");
+  copy_float_attribute("ts_denominator");
+  copy_float_attribute("ks_key");
+  copy_float_attribute("ks_mode");
+
+
 
   GeometrySet result;
   result.replace_pointcloud(filtered_points);
   params.set_output("Events"_ustr, std::move(result));
+}
+
+// if ones drags the Note Events output from Read MIDI file and drops in
+// a blank area from Geometry Nodes, a dialogue appears to search for the
+// next node. This register is needed so this node is found there.
+static void node_gather_link_search_ops(GatherLinkSearchOpParams &params)
+{
+  const NodeDeclaration &declaration = *params.node_type().static_declaration;
+  search_link_ops_for_declarations(params, declaration.inputs);
 }
 
 static void node_register()
@@ -121,6 +136,7 @@ static void node_register()
   ntype.nclass = NODE_CLASS_GEOMETRY;
   ntype.declare = node_declare;
   ntype.geometry_node_execute = node_geo_exec;
+  ntype.gather_link_search_ops = node_gather_link_search_ops;
   bke::node_register_type(ntype);
 }
 NOD_REGISTER_NODE(node_register)

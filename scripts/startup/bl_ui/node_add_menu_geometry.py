@@ -714,15 +714,18 @@ class NODE_MT_gn_utilities_midi_base(node_add_menu.NodeMenu):
     def draw(self, context):
         layout = self.layout
         self.node_operator(layout, "GeometryNodeMidiReadFile")
+        layout.separator()
         self.node_operator(layout, "GeometryNodeMidiFilterChannel")
         self.node_operator(layout, "GeometryNodeMidiFilterTrack")
+        layout.separator()
         self.node_operator(layout, "GeometryNodeMidiNoteInfo")
-        self.node_operator(layout, "GeometryNodeMidiTempoAt")
-        self.node_operator(layout, "GeometryNodeMidiTimeSignatureAt")
-        self.node_operator(layout, "GeometryNodeMidiKeySignatureAt")
         self.node_operator(layout, "GeometryNodeMidiTempoInfo")
         self.node_operator(layout, "GeometryNodeMidiTimeSignatureInfo")
         self.node_operator(layout, "GeometryNodeMidiKeySignatureInfo")
+        layout.separator()
+        self.node_operator(layout, "GeometryNodeMidiTempoAt")
+        self.node_operator(layout, "GeometryNodeMidiTimeSignatureAt")
+        self.node_operator(layout, "GeometryNodeMidiKeySignatureAt")
 
 
 class NODE_MT_gn_texture_base(node_add_menu.NodeMenu):
@@ -758,8 +761,9 @@ class NODE_MT_gn_utilities_base(node_add_menu.NodeMenu):
         self.draw_menu(layout, path="Utilities/Field")
         self.draw_menu(layout, path="Utilities/List")
         self.draw_menu(layout, path="Utilities/Matrix")
-        self.draw_menu(layout, path="Utilities/Midi")
         self.draw_menu(layout, path="Utilities/Rotation")
+        layout.separator()
+        self.draw_menu(layout, path="Utilities/Midi")
         self.draw_menu(layout, path="Utilities/Sound")
         layout.separator()
         self.for_each_element_zone(layout, label="For Each Element")

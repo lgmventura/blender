@@ -141,6 +141,15 @@ static void node_rna(StructRNA *srna)
                     int(TimeUnit::Seconds));
 }
 
+// if ones drags the Note Events output from Read MIDI file and drops in
+// a blank area from Geometry Nodes, a dialogue appears to search for the
+// next node. This register is needed so this node is found there.
+static void node_gather_link_search_ops(GatherLinkSearchOpParams &params)
+{
+  const NodeDeclaration &declaration = *params.node_type().static_declaration;
+  search_link_ops_for_declarations(params, declaration.inputs);
+}
+
 /* ---------- REGISTER ---------- */
 static void node_register()
 {
@@ -154,6 +163,7 @@ static void node_register()
   ntype.geometry_node_execute = node_geo_exec;
   ntype.draw_buttons = node_layout;
   ntype.initfunc = node_init;
+  ntype.gather_link_search_ops = node_gather_link_search_ops;
   bke::node_type_storage(ntype,
                          "NodeGeometryMidiTempoAt",
                          node_free_standard_storage,
