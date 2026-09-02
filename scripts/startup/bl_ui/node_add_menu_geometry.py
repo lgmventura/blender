@@ -726,6 +726,9 @@ class NODE_MT_gn_utilities_midi_base(node_add_menu.NodeMenu):
         self.node_operator(layout, "GeometryNodeMidiTempoAt")
         self.node_operator(layout, "GeometryNodeMidiTimeSignatureAt")
         self.node_operator(layout, "GeometryNodeMidiKeySignatureAt")
+        layout.separator()
+        self.node_operator(layout, "GeometryNodeMidiSecondsToQuarter")
+        self.node_operator(layout, "GeometryNodeMidiQuarterToSeconds")
 
 
 class NODE_MT_gn_texture_base(node_add_menu.NodeMenu):
